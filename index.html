@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<link rel="stylesheet" href="css/style.css">
+
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="cy"></div>
+
+<div id="details-panel">
+    <div id="details-resizer"></div>
+    <div class="details-header">
+        <h3>MewGraph</h3>
+        <input type="file" id="fileInput">
+    </div>
+    <div id="details-content"></div>
+</div>
+
+<div id="context-menu">
+    <div class="context-menu-header">
+        <h4>Add to Group</h4>
+    </div>
+    <div id="context-menu-existing"></div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" id="context-menu-new">
+        <span class="context-menu-icon">+</span>
+        <span>New Group</span>
+    </div>
+</div>
+
+<div id="group-input-overlay"></div>
+
+<div id="sidebar">
+    <div class="sidebar-header">
+        <h3>Filters</h3>
+    </div>
+
+    <div class="sidebar-section">
+        <h4>Operating System</h4>
+        <div class="filter-group" id="os-filters"></div>
+    </div>
+
+    <div class="sidebar-section">
+        <h4>Groups</h4>
+        <div class="filter-group" id="group-filters"></div>
+    </div>
+
+    <div class="sidebar-section">
+        <h4>Ports</h4>
+        <div class="filter-group" id="port-filters"></div>
+    </div>
+
+    <div class="sidebar-section">
+        <h4>IP Addresses</h4>
+        <div class="filter-group" id="ip-filters"></div>
+    </div>
+
+    <div class="sidebar-section">
+        <h4>Metadata</h4>
+        <div class="filter-group" id="metadata-filters"></div>
+    </div>
+
+    <div class="sidebar-section">
+        <h4>Layout</h4>
+        <div class="filter-group" id="layout-filters">
+            <span class="filter-item" style="cursor:default;font-weight:500">Orbit</span>
+        </div>
+    </div>
+</div>
+
+<script src="js/parser/parser.js"></script>
+<script src="js/topology/topology.js"></script>
+<script src="js/graph/graph.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/details.js"></script>
+<script src="js/contextmenu.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
