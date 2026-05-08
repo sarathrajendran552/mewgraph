@@ -351,26 +351,72 @@ body {
     opacity: 0.3;
 }
 
-.layout-btn {
-    justify-content: center;
-    font-weight: 500;
+.subnet-group {
+    margin-bottom: 8px;
 }
 
-.layout-btn input[type="radio"] {
+.subnet-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #0f3460;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.subnet-header:hover {
+    background: #1a4a8a;
+    border-color: #1a4a8a;
+}
+
+.subnet-chevron {
+    font-size: 10px;
+    color: #a0aec0;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.subnet-chevron.expanded {
+    transform: rotate(90deg);
+}
+
+.subnet-all-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    color: #a0aec0;
+}
+
+.subnet-all-label input[type="checkbox"] {
+    accent-color: #0f3460;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.subnet-body {
+    padding-left: 16px;
+    overflow: hidden;
+    transition: max-height 0.2s ease;
+}
+
+.subnet-body.collapsed {
     display: none;
 }
 
-.layout-btn span {
-    display: block;
-    width: 100%;
-    text-align: center;
-}
-
-.layout-btn.active {
-    background: #0f3460;
-    border-color: #1a4a8a;
-    color: #eaeaea;
-    font-weight: 600;
+.subnet-body .filter-item {
+    font-size: 13px;
+    padding: 6px 10px;
 }
 
 .group-tag {

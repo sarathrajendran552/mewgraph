@@ -78,26 +78,94 @@ function buildPortFilters(hosts) {
     })
 }
 
+function ipToNum(ip) {
+    return ip.split(".").map(Number).reduce((acc, v, i) => acc + v * Math.pow(256, 3 - i), 0)
+}
+
+function getSubnet(ip) {
+    return ip.split(".").slice(0, 3).join(".") + ".0/24"
+}
+
 function buildIPFilters(hosts) {
     const container = document.getElementById("ip-filters")
     container.innerHTML = ""
 
-    hosts.sort((a, b) => {
-        return a.ip.split(".").map(Number).reduce((acc, v, i) => acc + v * Math.pow(256, 3 - i), 0) -
-               b.ip.split(".").map(Number).reduce((acc, v, i) => acc + v * Math.pow(256, 3 - i), 0)
-    }).forEach(host => {
-        const label = document.createElement("label")
-        label.className = "filter-item"
-        label.innerHTML = `
-            <input type="checkbox" checked data-ip="${host.ip}">
-            <span>${host.ip}</span>
-            <span class="count">${host.ports.length} ports</span>
-        `
-        container.appendChild(label)
+    const subnets = {}
+    hosts.forEach(host => {
+        const subnet = getSubnet(host.ip)
+        if (!subnets[subnet]) subnets[subnet] = []
+        subnets[subnet].push(host)
     })
 
-    container.querySelectorAll("input[type='checkbox']").forEach(input => {
-        input.addEventListener("change", applyFilters)
+    const sortedSubnets = Object.keys(subnets).sort((a, b) => ipToNum(a) - ipToNum(b))
+
+    sortedSubnets.forEach(subnet => {
+        const hostsInSubnet = subnets[subnet].sort((a, b) => ipToNum(a.ip) - ipToNum(b.ip))
+        const totalPorts = hostsInSubnet.reduce((sum, h) => sum + h.ports.length, 0)
+
+        const group = document.createElement("div")
+        group.className = "subnet-group"
+
+        const header = document.createElement("div")
+        header.className = "subnet-header"
+        header.innerHTML = `
+            <span class="subnet-chevron">&#9654;</span>
+            <span>${subnet}</span>
+            <label class="subnet-all-label">
+                <input type="checkbox" class="subnet-all-cb" checked data-subnet="${subnet}">
+                <span>All</span>
+            </label>
+            <span class="count">${hostsInSubnet.length}</span>
+        `
+        group.appendChild(header)
+
+        const body = document.createElement("div")
+        body.className = "subnet-body collapsed"
+        group.appendChild(body)
+
+        hostsInSubnet.forEach(host => {
+            const label = document.createElement("label")
+            label.className = "filter-item"
+            label.innerHTML = `
+                <input type="checkbox" checked data-ip="${host.ip}">
+                <span>${host.ip}</span>
+                <span class="count">${host.ports.length} ports</span>
+            `
+            body.appendChild(label)
+
+            label.querySelector("input").addEventListener("change", () => {
+                updateSubnetAllCB(subnet)
+                applyFilters()
+            })
+        })
+
+        header.addEventListener("click", (e) => {
+            if (e.target.closest(".subnet-all-cb")) return
+            body.classList.toggle("collapsed")
+            const chevron = header.querySelector(".subnet-chevron")
+            chevron.classList.toggle("expanded")
+        })
+
+        header.querySelector(".subnet-all-cb").addEventListener("change", (e) => {
+            e.stopPropagation()
+            const checked = e.target.checked
+            body.querySelectorAll('input[data-ip]').forEach(cb => cb.checked = checked)
+            applyFilters()
+        })
+
+        container.appendChild(group)
+    })
+}
+
+function updateSubnetAllCB(subnet) {
+    const groups = document.querySelectorAll(".subnet-group")
+    groups.forEach(group => {
+        const cb = group.querySelector(`.subnet-all-cb[data-subnet="${subnet}"]`)
+        if (!cb) return
+        const ips = group.querySelectorAll('input[data-ip]')
+        const checkedCount = Array.from(ips).filter(cb => cb.checked).length
+        cb.checked = checkedCount === ips.length
+        cb.indeterminate = checkedCount > 0 && checkedCount < ips.length
     })
 }
 
@@ -112,7 +180,7 @@ function applyFilters() {
 
     document.querySelectorAll("#os-filters input:checked").forEach(el => activeOS.add(el.dataset.os))
     document.querySelectorAll("#port-filters input:checked").forEach(el => activePorts.add(el.dataset.port))
-    document.querySelectorAll("#ip-filters input:checked").forEach(el => activeIPs.add(el.dataset.ip))
+    document.querySelectorAll("#ip-filters input[data-ip]:checked").forEach(el => activeIPs.add(el.dataset.ip))
     document.querySelectorAll("#group-filters input:checked").forEach(el => activeGroups.add(el.dataset.group))
 
     document.querySelectorAll("#metadata-filters input:checked").forEach(el => {
